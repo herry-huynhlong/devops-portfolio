@@ -14,32 +14,41 @@ export default function Experience() {
       <SectionHeader>
         <h2>Experience</h2>
       </SectionHeader>
-      {experience.map((item, i) => (
-        <div className={styles.card} key={i}>
-          <div className={styles.header}>
-            <div className={styles.iconWrap}>
-              {item.image ? (
-                <img
-                  src={item.image}
-                  alt={item.company}
-                  onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'block' }}
-                />
-              ) : null}
-              <Briefcase style={item.image ? { display: 'none' } : {}} />
+
+      <div className={styles.grid}>
+        {experience.map((item, i) => (
+          <div className={styles.card} key={i}>
+            <div className={styles.header}>
+              <div className={styles.iconWrap}>
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.company}
+                    onError={(e) => {
+                      e.target.style.display = 'none'
+                      e.target.nextElementSibling.style.display = 'block'
+                    }}
+                  />
+                ) : null}
+
+                <Briefcase style={item.image ? { display: 'none' } : {}} />
+              </div>
+
+              <div className={styles.info}>
+                <h3 className={styles.title}>{item.title}</h3>
+                <p className={styles.company}>{item.company}</p>
+                <p className={styles.period}>{item.period}</p>
+              </div>
             </div>
-            <div className={styles.info}>
-              <h3 className={styles.title}>{item.title}</h3>
-              <p className={styles.company}>{item.company}</p>
-              <p className={styles.period}>{item.period}</p>
-            </div>
+
+            <ul className={styles.details}>
+              {item.details.map((d, j) => (
+                <li key={j}>{d}</li>
+              ))}
+            </ul>
           </div>
-          <ul className={styles.details}>
-            {item.details.map((d, j) => (
-              <li key={j}>{d}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
+        ))}
+      </div>
     </Section>
   )
 }
