@@ -1,82 +1,121 @@
 export const hero = {
-  name: 'Your Name',
-  title: 'Your Title / Role',
-  subtitle: 'A short tagline or description about yourself.',
-  resume: '/resume/resume.pdf',
+  name: 'HUỲNH LONG',
+  title: 'DevOps Engineer',
+  subtitle: 'Building reliable, scalable and automated infrastructure.',
+  resume: '/resume/Huynh_Long_DevOps.pdf',
 }
 
 export const about = {
-  image: '/images/profile.webp',
+  image: '/images/avt.png',
+
   paragraphs: [
-    'Write a short bio about yourself. This can be 1-3 paragraphs describing who you are, what you do, and what you are passionate about.',
-    'Talk about your tech stack, interests, and career goals.',
+    'I am a DevOps Engineer with hands-on experience in Linux systems, infrastructure deployment, CI/CD, web server administration, ERP operations, and cloud environments. My work focuses on building reliable, scalable, and automated systems that are easy to operate and maintain.',
+
+    'My experience includes Linux, Docker, Nginx, DNS, SSL/TLS, GitLab CI, GitHub Actions, AWS, physical server deployment, system administration, backup, troubleshooting, and production website infrastructure.',
   ],
 }
 
 export const education = [
   {
-    title: 'University Name',
-    degree: 'Your Degree',
-    period: '2024 - 2028',
-    institution: 'Faculty / Department',
-    details: [
-      'Brief description of your studies and achievements',
-      'Relevant coursework or highlights',
-    ],
-    status: 'In Progress',
-    image: '/images/university.webp',
-  },
-  {
-    title: 'School Name',
-    degree: 'Your Secondary Education',
-    period: '2020 - 2023',
-    institution: 'Track / Stream',
-    details: [
-      'Brief description of your school achievements',
-    ],
-    achievement: 'Key Achievement',
-    image: '/images/school.webp',
+    title: 'Dong A University',
+    degree: "Bachelor's Degree",
+    period: '',
+    institution: 'Dong A University',
+    details: [],
+    status: 'Graduated',
+    achievement: '',
+    image: '',
   },
 ]
 
 export const experience = [
   {
-    title: 'Job Title - Intern',
-    company: 'Company Name',
-    period: 'Month Year',
-    image: '/images/company.webp',
+    title: 'DevOps Engineer / Infrastructure Engineer',
+    company: 'DongNgo Group',
+    period: '2024 - Present',
+    image: '',
     details: [
-      'Describe your responsibilities and achievements',
-      'Highlight key technologies or skills used',
+      'Built CI/CD pipelines using GitLab CI and GitHub Actions.',
+      'Deployed and operated Dockerized applications on Linux.',
+      'Configured Nginx, DNS, SSL/TLS, and reverse proxy services.',
+      'Administered and supported ERP infrastructure and day-to-day system operations.',
+    ],
+  },
+
+  {
+    title: 'System Administrator / Infrastructure Engineer',
+    company: 'Minh Duy Technology',
+    period: '2022 - 2024',
+    image: '',
+    details: [
+      'Planned server infrastructure based on company requirements, including hardware selection and procurement.',
+      'Installed and configured physical servers, storage, networking, and Linux operating systems.',
+      'Deployed and maintained Linux servers hosting company websites and internal services.',
+      'Delivered production-ready web server environments from hardware setup to website deployment.',
     ],
   },
 ]
 
 export const skillCategories = [
   {
-    label: 'Languages',
-    skills: ['JavaScript', 'Python', 'TypeScript', 'SQL'],
+    label: 'Infrastructure & Systems',
+    skills: [
+      'Linux',
+      'Nginx',
+      'DNS',
+      'SSL/TLS',
+      'Server Administration',
+      'Networking',
+    ],
   },
+
   {
-    label: 'Frameworks & Libraries',
-    skills: ['Next.js', 'React', 'Node.js', 'Express'],
+    label: 'DevOps & CI/CD',
+    skills: [
+      'Docker',
+      'GitLab CI',
+      'GitHub Actions',
+      'Git',
+      'CI/CD',
+    ],
   },
+
   {
-    label: 'Databases & Tools',
-    skills: ['PostgreSQL', 'Supabase', 'Git', 'Docker'],
-  },
-  {
-    label: 'Other',
-    skills: ['REST APIs', 'OOP', 'Teamwork', 'Problem Solving'],
+    label: 'Cloud & Operations',
+    skills: [
+      'AWS',
+      'ERP Operations',
+      'Backup & Recovery',
+      'Monitoring',
+      'Troubleshooting',
+    ],
   },
 ]
 
 export const contact = {
-  whatsapp: 'https://wa.me/yournumber',
-  email: 'your.email@example.com',
+  whatsapp: '',
+
+  phone: '0935269851',
+
+  zalo: '',
+
+  zalo_qr: '/images/zalo-qr.jpg',
+
+  email: 'huynhlong2303la@gmail.com',
+
+  github: 'https://github.com/herry-huynhlong',
+
+  linkedin:
+    'https://www.linkedin.com/in/long-hu%E1%BB%B3nh-b88a62353/',
+
+  facebook: '',
+
   social: {
-    github: 'https://github.com/yourusername',
-    linkedin: 'https://linkedin.com/in/yourusername',
-    facebook: 'https://facebook.com/yourusername',
+    github: 'https://github.com/herry-huynhlong',
+
+    linkedin:
+      'https://www.linkedin.com/in/long-hu%E1%BB%B3nh-b88a62353/',
+
+    facebook: '',
   },
 }
