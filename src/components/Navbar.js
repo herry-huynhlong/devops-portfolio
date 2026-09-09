@@ -58,7 +58,7 @@ export default function Navbar() {
     <nav className={cn(styles.nav, scrolled && styles.navScrolled)}>
       <div className={styles.inner}>
         <a href="#home" className={styles.logo} onClick={(e) => handleNavClick(e, '#home')}>
-          Your Name<span className={styles.logoDot}>.</span>dev
+          Herry Huỳnh<span className={styles.logoDot}></span>
         </a>
         <button
           className={cn(styles.hamburger, open && styles.hamburgerOpen)}
