@@ -1,0 +1,1176 @@
+HƯỚNG DẪN QUẢN TRỊ DEVOPS PORTFOLIO TỪ A-Z
+==========================================
+
+Mục tiêu
+--------
+Tài liệu này dùng cho website portfolio đang chạy theo mô hình:
+
+Internet
+   |
+   v
+Nginx :80 / :443
+   |
+   v
+Next.js :3000 (localhost)
+   |
+   v
+Supabase
+
+Server:
+- Ubuntu EC2
+- Project: /home/ubuntu/Portfolio-Template
+- Service systemd: portfolio.service
+- Nginx reverse proxy
+- Supabase lưu dữ liệu động
+- GitHub lưu source code
+
+------------------------------------------------------------
+1. CÁC ĐƯỜNG DẪN QUAN TRỌNG
+------------------------------------------------------------
+
+Source:
+  /home/ubuntu/Portfolio-Template
+
+Systemd service:
+  /etc/systemd/system/portfolio.service
+
+Nginx config:
+  /etc/nginx/sites-available/portfolio
+
+Nginx enabled:
+  /etc/nginx/sites-enabled/portfolio
+
+Biến môi trường:
+  /home/ubuntu/Portfolio-Template/.env
+
+Trang public:
+  http://IP-SERVER
+  hoặc
+  https://TEN-MIEN-CUA-BAN
+
+Trang admin:
+  http://IP-SERVER/admin
+  hoặc
+  https://TEN-MIEN-CUA-BAN/admin
+
+------------------------------------------------------------
+2. QUẢN LÝ NỘI DUNG HẰNG NGÀY
+------------------------------------------------------------
+
+Các nội dung như:
+- Hero
+- About
+- Education
+- Experience
+- Skills
+- Projects
+- Contact
+
+nên sửa trực tiếp tại:
+
+  https://TEN-MIEN-CUA-BAN/admin
+
+Sau khi sửa:
+  Save Changes
+  rồi F5 trang public.
+
+KHÔNG cần:
+  npm run build
+  systemctl restart
+  nginx reload
+
+vì dữ liệu này được lưu trong Supabase.
+
+------------------------------------------------------------
+3. THÊM / SỬA / XÓA NỘI DUNG TRONG ADMIN
+------------------------------------------------------------
+
+Hero:
+  /admin/hero
+
+About:
+  /admin/about
+
+Education:
+  /admin/education
+
+Experience:
+  /admin/experience
+
+Skills:
+  /admin/skills
+
+Projects:
+  /admin/projects
+
+Contact:
+  /admin/contact
+
+Nếu Save báo thành công nhưng reload lại mất:
+- vào Supabase
+- Table Editor
+- kiểm tra bảng tương ứng có dữ liệu hay chưa
+
+Các bảng singleton như:
+  hero
+  about
+  contact
+
+thường cần có dòng id = 1.
+
+Có thể tạo bằng SQL:
+
+INSERT INTO hero (id, name, title, subtitle, resume)
+VALUES (1, '', '', '', '')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO about (id, image, paragraphs)
+VALUES (1, '', '[]'::jsonb)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO contact (
+    id, whatsapp, email, github, linkedin, facebook
+)
+VALUES (
+    1, '', '', '', '', ''
+)
+ON CONFLICT (id) DO NOTHING;
+
+------------------------------------------------------------
+4. QUẢN LÝ TÀI KHOẢN ADMIN SUPABASE
+------------------------------------------------------------
+
+Vào:
+  Supabase Dashboard
+  -> Authentication
+  -> Users
+
+Tạo user admin:
+  Add user
+  -> Create new user
+
+Dùng email/password này để đăng nhập:
+  /admin/login
+
+Khuyến nghị:
+- tắt public sign up
+- chỉ giữ tài khoản admin cần thiết
+- dùng mật khẩu mạnh
+- không chia sẻ Service Role key
+
+------------------------------------------------------------
+5. CẤU HÌNH SUPABASE
+------------------------------------------------------------
+
+File:
+  /home/ubuntu/Portfolio-Template/.env
+
+Ví dụ:
+
+SUPABASE_URL=https://xxxxxxxx.supabase.co
+SUPABASE_ANON_KEY=sb_publishable_xxxxxxxxxxxxxxxxx
+
+Lưu ý:
+- không commit .env lên GitHub
+- không dùng service_role key trong frontend
+- Publishable key có thể dùng cho app theo đúng thiết kế của Supabase
+
+Sau khi sửa .env:
+
+  cd ~/Portfolio-Template
+  sudo systemctl restart portfolio
+
+Nếu biến môi trường được dùng trong build-time hoặc có NEXT_PUBLIC_*:
+  npm run build
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+6. SỬA SOURCE CODE
+------------------------------------------------------------
+
+Ví dụ:
+- sửa Navbar
+- đổi logo chữ
+- sửa layout
+- sửa CSS
+- sửa component
+- thêm section mới
+- thay code JavaScript / React / Next.js
+
+Thao tác:
+
+  cd ~/Portfolio-Template
+  nano DUONG-DAN-FILE
+
+Ví dụ sửa Navbar:
+
+  nano src/components/Navbar.js
+
+Sau khi sửa source:
+
+  npm run build
+  sudo systemctl restart portfolio
+
+Kiểm tra:
+
+  sudo systemctl status portfolio --no-pager
+
+Nếu cần xem log:
+
+  sudo journalctl -u portfolio -n 100 --no-pager
+
+------------------------------------------------------------
+7. GIT - QUY TRÌNH PUSH SOURCE
+------------------------------------------------------------
+
+Kiểm tra:
+
+  cd ~/Portfolio-Template
+  git status
+
+Thêm file:
+
+  git add .
+
+Commit:
+
+  git commit -m "Update portfolio"
+
+Push:
+
+  git push
+
+Quy trình đầy đủ:
+
+  cd ~/Portfolio-Template
+  git status
+  git add .
+  git commit -m "Update portfolio"
+  git push
+  npm run build
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+8. GIT - PULL SOURCE MỚI TỪ GITHUB
+------------------------------------------------------------
+
+Nếu sửa code ở máy khác rồi push lên GitHub:
+
+  cd ~/Portfolio-Template
+  git pull
+  npm install
+  npm run build
+  sudo systemctl restart portfolio
+
+Kiểm tra:
+
+  sudo systemctl status portfolio --no-pager
+
+------------------------------------------------------------
+9. KHÔNG ĐƯỢC PUSH .ENV
+------------------------------------------------------------
+
+Kiểm tra .gitignore:
+
+  cat .gitignore
+
+Nên có:
+
+.env
+.env.local
+.env.production
+node_modules
+.next
+
+Nếu .env đang bị Git theo dõi:
+
+  git rm --cached .env
+
+sau đó:
+
+  git commit -m "Remove env file from repository"
+  git push
+
+------------------------------------------------------------
+10. SYSTEMD - QUẢN LÝ NEXT.JS
+------------------------------------------------------------
+
+Start:
+
+  sudo systemctl start portfolio
+
+Stop:
+
+  sudo systemctl stop portfolio
+
+Restart:
+
+  sudo systemctl restart portfolio
+
+Status:
+
+  sudo systemctl status portfolio --no-pager
+
+Enable khi reboot:
+
+  sudo systemctl enable portfolio
+
+Log realtime:
+
+  sudo journalctl -u portfolio -f
+
+Log 100 dòng:
+
+  sudo journalctl -u portfolio -n 100 --no-pager
+
+------------------------------------------------------------
+11. MẪU SYSTEMD SERVICE
+------------------------------------------------------------
+
+File:
+
+  sudo nano /etc/systemd/system/portfolio.service
+
+Ví dụ:
+
+[Unit]
+Description=DevOps Portfolio Next.js
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/Portfolio-Template
+
+Environment=NODE_ENV=production
+Environment=HOME=/home/ubuntu
+Environment=PATH=/home/ubuntu/.nvm/versions/node/v24.21.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ExecStart=/home/ubuntu/.nvm/versions/node/v24.21.0/bin/npm start -- -H 127.0.0.1 -p 3000
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+Sau khi sửa service:
+
+  sudo systemctl daemon-reload
+  sudo systemctl restart portfolio
+  sudo systemctl status portfolio --no-pager
+
+------------------------------------------------------------
+12. KIỂM TRA PORT 3000
+------------------------------------------------------------
+
+  sudo ss -ltnp | grep :3000
+
+Mong muốn:
+
+  127.0.0.1:3000
+
+Test trực tiếp Next.js:
+
+  curl -I --max-time 10 http://127.0.0.1:3000
+
+Nếu trả:
+  HTTP/1.1 200 OK
+
+thì Next.js hoạt động.
+
+------------------------------------------------------------
+13. LƯU Ý CTRL+C VÀ CTRL+Z
+------------------------------------------------------------
+
+Khi chạy process foreground:
+
+  Ctrl+C = dừng process
+
+KHÔNG nên dùng:
+
+  Ctrl+Z
+
+vì Ctrl+Z chỉ suspend process.
+Process vẫn có thể giữ port 3000 và gây:
+  EADDRINUSE
+  504 Gateway Time-out
+
+Nếu port bị process cũ giữ:
+
+  sudo fuser -k 3000/tcp
+
+sau đó:
+
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+14. NGINX - REVERSE PROXY
+------------------------------------------------------------
+
+File:
+
+  sudo nano /etc/nginx/sites-available/portfolio
+
+Mẫu HTTP:
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name TEN-MIEN-CUA-BAN www.TEN-MIEN-CUA-BAN;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+Kiểm tra config:
+
+  sudo nginx -t
+
+Reload:
+
+  sudo systemctl reload nginx
+
+Nếu sửa config Nginx:
+  nginx -t
+  rồi reload
+
+Không cần restart Next.js nếu chỉ sửa Nginx.
+
+------------------------------------------------------------
+15. THÊM TÊN MIỀN
+------------------------------------------------------------
+
+Bước 1:
+Nên gán Elastic IP cho EC2 để IP không đổi khi reboot/stop-start.
+
+Bước 2:
+Ở nhà cung cấp DNS, tạo:
+
+A record:
+  @
+  -> ELASTIC-IP
+
+A record:
+  www
+  -> ELASTIC-IP
+
+Hoặc:
+
+CNAME:
+  www
+  -> TEN-MIEN-CUA-BAN
+
+Bước 3:
+Sửa Nginx:
+
+  sudo nano /etc/nginx/sites-available/portfolio
+
+Đổi:
+
+  server_name _;
+
+thành:
+
+  server_name example.com www.example.com;
+
+Bước 4:
+
+  sudo nginx -t
+  sudo systemctl reload nginx
+
+Bước 5:
+Kiểm tra DNS:
+
+  nslookup example.com
+
+hoặc:
+
+  dig example.com
+
+------------------------------------------------------------
+16. THÊM HTTPS / SSL LET'S ENCRYPT
+------------------------------------------------------------
+
+Cài Certbot:
+
+  sudo apt update
+  sudo apt install -y certbot python3-certbot-nginx
+
+Xin certificate:
+
+  sudo certbot --nginx -d example.com -d www.example.com
+
+Certbot thường sẽ:
+- tạo SSL certificate
+- cấu hình HTTPS
+- có thể redirect HTTP -> HTTPS
+
+Kiểm tra:
+
+  https://example.com
+
+Test renewal:
+
+  sudo certbot renew --dry-run
+
+------------------------------------------------------------
+17. MỞ PORT TRÊN AWS SECURITY GROUP
+------------------------------------------------------------
+
+Nên có:
+
+22 TCP
+  Source: IP của bạn
+
+80 TCP
+  Source: 0.0.0.0/0
+
+443 TCP
+  Source: 0.0.0.0/0
+
+KHÔNG cần public:
+3000 TCP
+
+Port 3000 chỉ nên listen:
+  127.0.0.1:3000
+
+------------------------------------------------------------
+18. THÊM DOMAIN MỚI
+------------------------------------------------------------
+
+Ví dụ đang có:
+  olddomain.com
+
+muốn thêm:
+  newdomain.com
+
+DNS:
+  newdomain.com -> Elastic IP
+
+Nginx:
+
+server_name olddomain.com www.olddomain.com newdomain.com www.newdomain.com;
+
+Sau đó:
+
+  sudo nginx -t
+  sudo systemctl reload nginx
+
+Thêm SSL:
+
+  sudo certbot --nginx \
+    -d olddomain.com \
+    -d www.olddomain.com \
+    -d newdomain.com \
+    -d www.newdomain.com
+
+------------------------------------------------------------
+19. XÓA DOMAIN CŨ
+------------------------------------------------------------
+
+Bước 1:
+Sửa Nginx:
+
+  sudo nano /etc/nginx/sites-available/portfolio
+
+Xóa domain cũ khỏi:
+
+  server_name
+
+Bước 2:
+
+  sudo nginx -t
+  sudo systemctl reload nginx
+
+Bước 3:
+Xóa DNS record cũ ở nhà cung cấp DNS nếu không còn dùng.
+
+Bước 4:
+Nếu muốn dọn certificate cũ:
+
+  sudo certbot certificates
+
+Sau đó dùng:
+
+  sudo certbot delete --cert-name TEN-CERTIFICATE
+
+Chỉ xóa certificate khi chắc chắn domain không còn sử dụng.
+
+------------------------------------------------------------
+20. ĐỔI DOMAIN
+------------------------------------------------------------
+
+Ví dụ:
+  old.com -> new.com
+
+Làm theo thứ tự:
+
+1. Trỏ DNS new.com -> Elastic IP
+2. Thêm new.com vào server_name Nginx
+3. nginx -t
+4. reload nginx
+5. chạy certbot cho new.com
+6. kiểm tra HTTPS new.com
+7. sau khi ổn mới xóa old.com
+
+Không nên xóa domain cũ trước khi domain mới hoạt động.
+
+------------------------------------------------------------
+21. REDIRECT DOMAIN CŨ SANG DOMAIN MỚI
+------------------------------------------------------------
+
+Ví dụ:
+
+server {
+    listen 80;
+    server_name old.com www.old.com;
+    return 301 https://new.com$request_uri;
+}
+
+Nếu old.com có HTTPS thì nên giữ certificate cho old.com trong thời gian redirect.
+
+------------------------------------------------------------
+22. ẢNH PROFILE
+------------------------------------------------------------
+
+Nếu dùng thư mục public:
+
+  mkdir -p ~/Portfolio-Template/public/images
+
+Ví dụ:
+
+  ~/Portfolio-Template/public/images/profile.png
+
+URL:
+
+  /images/profile.png
+
+Trong Admin -> About -> IMAGE PATH:
+
+  /images/profile.png
+
+Nếu vừa thêm file static mà app production chưa thấy ảnh:
+
+  cd ~/Portfolio-Template
+  npm run build
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+23. CÁCH TỐT HƠN CHO ẢNH - NGINX SERVE TRỰC TIẾP
+------------------------------------------------------------
+
+Để thay ảnh mà không cần build Next.js:
+
+Tạo thư mục:
+
+  sudo mkdir -p /var/www/portfolio-media
+
+Copy ảnh:
+
+  sudo cp profile.png /var/www/portfolio-media/profile.png
+
+Nginx:
+
+location /media/ {
+    alias /var/www/portfolio-media/;
+}
+
+Sau đó:
+
+  sudo nginx -t
+  sudo systemctl reload nginx
+
+Admin dùng:
+
+  /media/profile.png
+
+Sau này thay ảnh:
+
+  sudo cp anh-moi.png /var/www/portfolio-media/profile.png
+
+Sau đó chỉ cần F5 browser.
+
+------------------------------------------------------------
+24. NÊN DÙNG SUPABASE STORAGE CHO ẢNH
+------------------------------------------------------------
+
+Về lâu dài nên:
+- tạo bucket Supabase Storage
+- upload avatar/project image qua Supabase
+- lưu URL trong database
+
+Lợi ích:
+- không cần SCP
+- không cần SSH
+- không cần build app khi thay ảnh
+- dễ quản lý ảnh trong Admin
+
+------------------------------------------------------------
+25. KHI NÀO CẦN BUILD / RESTART / RELOAD?
+------------------------------------------------------------
+
+A. Sửa Hero/About/Skills/Projects trong Admin:
+  Chỉ Save + F5
+  Không build
+  Không restart
+  Không reload nginx
+
+B. Sửa dữ liệu Supabase:
+  Chỉ F5
+
+C. Sửa source Next.js / CSS / component:
+  npm run build
+  sudo systemctl restart portfolio
+
+D. Sửa .env server-side:
+  sudo systemctl restart portfolio
+
+E. Sửa NEXT_PUBLIC_*:
+  npm run build
+  sudo systemctl restart portfolio
+
+F. Sửa Nginx config:
+  sudo nginx -t
+  sudo systemctl reload nginx
+
+G. Thay ảnh do Nginx serve trực tiếp:
+  chỉ thay file + F5
+
+------------------------------------------------------------
+26. LỖI 504 GATEWAY TIME-OUT
+------------------------------------------------------------
+
+Kiểm tra Next.js:
+
+  curl -I --max-time 10 http://127.0.0.1:3000
+
+Kiểm tra port:
+
+  sudo ss -ltnp | grep :3000
+
+Kiểm tra service:
+
+  sudo systemctl status portfolio --no-pager
+
+Xem log:
+
+  sudo journalctl -u portfolio -n 100 --no-pager
+
+Kiểm tra Nginx:
+
+  sudo tail -100 /var/log/nginx/error.log
+
+Nếu process bị treo hoặc suspend:
+
+  sudo systemctl stop portfolio
+  sudo fuser -k 3000/tcp
+  sudo systemctl start portfolio
+
+------------------------------------------------------------
+27. LỖI EADDRINUSE PORT 3000
+------------------------------------------------------------
+
+Lỗi:
+
+  Error: listen EADDRINUSE: address already in use 127.0.0.1:3000
+
+Kiểm tra:
+
+  sudo ss -ltnp | grep :3000
+
+Kill process cũ:
+
+  sudo fuser -k 3000/tcp
+
+Sau đó:
+
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+28. LỖI 502 BAD GATEWAY
+------------------------------------------------------------
+
+Thường do Next.js không chạy.
+
+Kiểm tra:
+
+  sudo systemctl status portfolio --no-pager
+  sudo ss -ltnp | grep :3000
+  curl -I http://127.0.0.1:3000
+
+Restart:
+
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+29. KIỂM TRA NGINX
+------------------------------------------------------------
+
+Config syntax:
+
+  sudo nginx -t
+
+Status:
+
+  sudo systemctl status nginx --no-pager
+
+Restart:
+
+  sudo systemctl restart nginx
+
+Reload:
+
+  sudo systemctl reload nginx
+
+Error log:
+
+  sudo tail -100 /var/log/nginx/error.log
+
+Access log:
+
+  sudo tail -100 /var/log/nginx/access.log
+
+------------------------------------------------------------
+30. KIỂM TRA WEBSITE
+------------------------------------------------------------
+
+Next.js trực tiếp:
+
+  curl -I http://127.0.0.1:3000
+
+Qua Nginx:
+
+  curl -I http://127.0.0.1
+
+Qua domain:
+
+  curl -I https://example.com
+
+------------------------------------------------------------
+31. BACKUP SOURCE
+------------------------------------------------------------
+
+Source đã nằm trên GitHub.
+
+Kiểm tra trước khi thay đổi lớn:
+
+  git status
+
+Commit:
+
+  git add .
+  git commit -m "Backup before major change"
+  git push
+
+Có thể tạo tag:
+
+  git tag backup-YYYYMMDD
+  git push origin backup-YYYYMMDD
+
+------------------------------------------------------------
+32. BACKUP SUPABASE
+------------------------------------------------------------
+
+Nên định kỳ:
+- export dữ liệu
+- lưu schema.sql
+- backup các bảng quan trọng
+- lưu danh sách project/experience/skills/contact
+
+Không lưu password admin hoặc secret key trong repo public.
+
+------------------------------------------------------------
+33. ROLLBACK CODE KHI SỬA HỎNG
+------------------------------------------------------------
+
+Xem commit:
+
+  git log --oneline -10
+
+Quay về commit trước để kiểm tra:
+
+  git checkout COMMIT_ID
+
+Muốn quay branch main về commit cũ cần cẩn thận.
+An toàn hơn là tạo revert:
+
+  git revert COMMIT_ID
+
+Sau đó:
+
+  git push
+  npm run build
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+34. CLONE LẠI SERVER TỪ GITHUB
+------------------------------------------------------------
+
+Nếu cần dựng lại từ đầu:
+
+  cd ~
+  git clone https://github.com/USERNAME/devops-portfolio.git Portfolio-Template
+  cd Portfolio-Template
+
+Cài dependency:
+
+  npm install
+
+Tạo .env:
+
+  nano .env
+
+Điền:
+
+SUPABASE_URL=https://xxxxxxxx.supabase.co
+SUPABASE_ANON_KEY=sb_publishable_xxxxxxxxx
+
+Build:
+
+  npm run build
+
+Tạo systemd service.
+Tạo Nginx config.
+Start:
+
+  sudo systemctl enable portfolio
+  sudo systemctl start portfolio
+
+------------------------------------------------------------
+35. UPDATE DEPENDENCIES
+------------------------------------------------------------
+
+Xem outdated:
+
+  npm outdated
+
+Không nên update toàn bộ package bừa trên production.
+
+Trước khi update:
+
+  git add .
+  git commit -m "Backup before dependency update"
+  git push
+
+Sau đó mới update và test.
+
+------------------------------------------------------------
+36. LOG CẦN NHỚ
+------------------------------------------------------------
+
+Next.js:
+
+  sudo journalctl -u portfolio -f
+
+Nginx error:
+
+  sudo tail -f /var/log/nginx/error.log
+
+Nginx access:
+
+  sudo tail -f /var/log/nginx/access.log
+
+------------------------------------------------------------
+37. SECURITY CHECKLIST
+------------------------------------------------------------
+
+Nên:
+- dùng Elastic IP
+- chỉ mở 22 từ IP của bạn
+- mở 80/443 public
+- không mở 3000 public
+- bật HTTPS
+- tắt Supabase public signup
+- dùng password admin mạnh
+- không commit .env
+- không dùng service_role key phía client
+- cập nhật Ubuntu định kỳ
+- cập nhật Nginx/Node có kiểm soát
+- backup GitHub và Supabase
+- dùng SSH key thay password nếu có thể
+
+------------------------------------------------------------
+38. UPDATE UBUNTU
+------------------------------------------------------------
+
+  sudo apt update
+  sudo apt upgrade -y
+
+Sau update kernel có thể cần reboot:
+
+  sudo reboot
+
+Sau reboot kiểm tra:
+
+  sudo systemctl status portfolio --no-pager
+  sudo systemctl status nginx --no-pager
+
+------------------------------------------------------------
+39. KIỂM TRA WEBSITE SAU REBOOT
+------------------------------------------------------------
+
+  sudo systemctl status portfolio --no-pager
+  sudo systemctl status nginx --no-pager
+  sudo ss -ltnp | grep :3000
+  curl -I http://127.0.0.1:3000
+  curl -I http://127.0.0.1
+
+------------------------------------------------------------
+40. LỆNH NHANH HẰNG NGÀY
+------------------------------------------------------------
+
+Status app:
+  sudo systemctl status portfolio --no-pager
+
+Restart app:
+  sudo systemctl restart portfolio
+
+Log app:
+  sudo journalctl -u portfolio -f
+
+Status Nginx:
+  sudo systemctl status nginx --no-pager
+
+Reload Nginx:
+  sudo nginx -t && sudo systemctl reload nginx
+
+Port 3000:
+  sudo ss -ltnp | grep :3000
+
+Test app:
+  curl -I http://127.0.0.1:3000
+
+Test Nginx:
+  curl -I http://127.0.0.1
+
+Git:
+  git status
+  git add .
+  git commit -m "Update portfolio"
+  git push
+
+Deploy code:
+  git pull
+  npm install
+  npm run build
+  sudo systemctl restart portfolio
+
+------------------------------------------------------------
+41. QUY TRÌNH CHUẨN KHI SỬA WEBSITE
+------------------------------------------------------------
+
+Nếu chỉ sửa nội dung:
+  /admin
+  -> sửa
+  -> Save
+  -> F5
+
+Nếu sửa code:
+  sửa file
+  -> git add .
+  -> git commit
+  -> git push
+  -> npm run build
+  -> systemctl restart portfolio
+
+Nếu sửa Nginx:
+  sửa config
+  -> nginx -t
+  -> systemctl reload nginx
+
+Nếu sửa DNS/domain:
+  sửa DNS
+  -> sửa server_name
+  -> nginx -t
+  -> reload nginx
+  -> certbot nếu cần HTTPS
+
+------------------------------------------------------------
+42. KIẾN TRÚC CUỐI NÊN DÙNG
+------------------------------------------------------------
+
+User
+  |
+  v
+Domain
+  |
+  v
+DNS
+  |
+  v
+AWS Elastic IP
+  |
+  v
+EC2
+  |
+  +--> Nginx :80/:443
+          |
+          v
+      Next.js 127.0.0.1:3000
+          |
+          v
+      Supabase
+          |
+          +--> Auth
+          +--> PostgreSQL
+          +--> Storage (nếu dùng)
+
+Source:
+  GitHub
+
+Process:
+  systemd
+
+SSL:
+  Let's Encrypt / Certbot
+
+------------------------------------------------------------
+43. GỢI Ý NÂNG CẤP SAU NÀY
+------------------------------------------------------------
+
+Nên nâng cấp:
+- Supabase Storage cho avatar/project images
+- upload ảnh trực tiếp trong Admin
+- Certifications section
+- Architecture section
+- GitHub activity
+- dark/light mode nếu cần
+- analytics
+- sitemap + SEO
+- custom domain
+- HTTPS
+- Cloudflare nếu muốn CDN/WAF
+- CI/CD tự động deploy từ GitHub
+- backup tự động
+
+------------------------------------------------------------
+44. MỤC TIÊU VẬN HÀNH
+------------------------------------------------------------
+
+Sau khi cấu hình ổn:
+
+90-95% việc chỉnh profile:
+  chỉ cần /admin -> Save -> F5
+
+Chỉ SSH khi:
+- sửa code
+- sửa Nginx
+- sửa domain
+- update server
+- troubleshooting
+- deploy version mới
+
+============================================================
+KẾT THÚC
+============================================================
