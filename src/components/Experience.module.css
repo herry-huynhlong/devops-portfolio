@@ -1,125 +1,1612 @@
+/* =========================================================
+   STAGE
+   ========================================================= */
+
+.stage {
+  position: relative;
+  isolation: isolate;
+}
+
+
+.backgroundGrid {
+  position: absolute;
+  inset: -50px -25px;
+
+  z-index: 0;
+
+  pointer-events: none;
+
+  opacity: 0.16;
+
+  background-image:
+    linear-gradient(
+      rgba(113, 104, 189, 0.07) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(113, 104, 189, 0.07) 1px,
+      transparent 1px
+    );
+
+  background-size: 40px 40px;
+
+  mask-image:
+    radial-gradient(
+      ellipse at center,
+      black 0%,
+      rgba(0, 0, 0, 0.7) 56%,
+      transparent 87%
+    );
+
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse at center,
+      black 0%,
+      rgba(0, 0, 0, 0.7) 56%,
+      transparent 87%
+    );
+}
+
+
+.backgroundGlow {
+  position: absolute;
+
+  z-index: 0;
+
+  width: 500px;
+  height: 350px;
+
+  left: 50%;
+  top: 48%;
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(89, 70, 205, 0.075),
+      rgba(48, 144, 205, 0.025) 45%,
+      transparent 72%
+    );
+
+  filter: blur(15px);
+}
+
+
+/* =========================================================
+   CAREER PIPELINE
+   ========================================================= */
+
+.careerPipeline {
+  position: relative;
+
+  z-index: 2;
+
+  margin-bottom: 26px;
+
+  padding:
+    14px 19px 20px;
+
+  border:
+    1px solid rgba(112, 101, 194, 0.13);
+
+  border-radius: 10px;
+
+  background:
+    rgba(8, 10, 21, 0.28);
+
+  opacity: 0;
+
+  transform:
+    translateY(10px);
+}
+
+
+.visible .careerPipeline {
+  animation:
+    pipelineAppear
+    0.65s ease
+    forwards;
+}
+
+
+.pipelineHeader {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 19px;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 7px;
+
+  letter-spacing: 0.11em;
+
+  color:
+    rgba(151, 148, 182, 0.52);
+}
+
+
+.pipelineState {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color:
+    rgba(82, 211, 165, 0.58);
+}
+
+
+.pipelineState i {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(73, 229, 164, 0.92);
+
+  box-shadow:
+    0 0 7px
+    rgba(73, 229, 164, 0.5);
+
+  animation:
+    statusPulse
+    1.7s ease-in-out infinite;
+}
+
+
+.pipelineTrack {
+  position: relative;
+
+  height: 2px;
+
+  margin:
+    0 13px;
+
+  border-radius: 5px;
+
+  background:
+    rgba(110, 102, 166, 0.14);
+}
+
+
+.pipelineFill {
+  position: absolute;
+
+  inset: 0;
+
+  transform:
+    scaleX(0);
+
+  transform-origin:
+    left center;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7862f4,
+      #5c9ae9,
+      #4fd0ca
+    );
+
+  box-shadow:
+    0 0 9px
+    rgba(90, 111, 232, 0.18);
+}
+
+
+.visible .pipelineFill {
+  animation:
+    pipelineFill
+    1.7s
+    cubic-bezier(.2,.75,.25,1)
+    0.3s
+    forwards;
+}
+
+
+.yearNode {
+  position: absolute;
+
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.yearNode i {
+  width: 8px;
+  height: 8px;
+
+  border:
+    2px solid #151426;
+
+  border-radius: 50%;
+
+  background:
+    #7c69ef;
+
+  opacity: 0;
+
+  transform:
+    scale(0.4);
+}
+
+
+.visible .yearNode i {
+  animation:
+    yearOnline
+    0.3s ease
+    1.65s
+    forwards;
+}
+
+
+.yearNode:last-child i {
+  background:
+    rgba(77, 224, 164, 0.95);
+
+  box-shadow:
+    0 0 8px
+    rgba(77, 224, 164, 0.45);
+}
+
+
+.yearNode span {
+  position: absolute;
+
+  top: 11px;
+
+  white-space: nowrap;
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 7px;
+
+  color:
+    rgba(169, 166, 196, 0.62);
+}
+
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
 .grid {
+  position: relative;
+
+  z-index: 2;
+
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
   gap: 24px;
+
   align-items: stretch;
 }
 
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
 .card {
-  background: var(--neutral-primary-medium);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  width: 100%;
-  max-width: none;
+  --card-delay: 0ms;
+
   position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+
   overflow: hidden;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s;
+
+  border:
+    1px solid
+    rgba(112, 102, 189, 0.22);
+
+  border-radius:
+    var(--radius-lg);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 17, 33, 0.96),
+      rgba(10, 13, 26, 0.93)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,0.016),
+    0 18px 55px
+      rgba(0,0,0,0.09);
+
+  opacity: 0;
+
+  transform:
+    translateY(20px)
+    scale(0.992);
+
+  transition:
+    border-color 0.35s,
+    transform 0.35s,
+    box-shadow 0.35s;
 }
+
+
+.visible .card {
+  animation:
+    cardBoot
+    0.72s
+    cubic-bezier(.2,.78,.25,1)
+    forwards;
+
+  animation-delay:
+    var(--card-delay);
+}
+
 
 .card::before {
   content: '';
+
   position: absolute;
-  top: 0;
+
   left: 0;
-  width: 3px;
-  height: 0;
-  background: var(--gradient-1);
-  transition: height 0.4s;
+  top: 15px;
+  bottom: 15px;
+
+  width: 2px;
+
+  border-radius:
+    0 4px 4px 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(122, 101, 244, 0.85),
+      rgba(72, 187, 228, 0.65),
+      transparent
+    );
+
+  opacity: 0.45;
+
+  transition:
+    opacity 0.3s;
 }
 
-.card:hover::before { height: 100%; }
+
+.activeCard::before {
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(83, 204, 226, 0.75),
+      rgba(69, 223, 163, 0.76),
+      transparent
+    );
+
+  opacity: 0.68;
+}
+
 
 .card:hover {
-  border-color: var(--border-brand);
-  box-shadow: var(--glow-brand);
-  transform: translateX(4px);
+  transform:
+    translateY(-4px);
+
+  border-color:
+    rgba(128, 110, 239, 0.52);
+
+  box-shadow:
+    0 18px 58px
+      rgba(0, 0, 0, 0.18),
+    0 0 30px
+      rgba(92, 74, 215, 0.07);
 }
 
-.header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
+
+.activeCard:hover {
+  border-color:
+    rgba(79, 211, 172, 0.36);
 }
+
+
+.card:hover::before {
+  opacity: 1;
+}
+
+
+/* =========================================================
+   HUD CORNERS
+   ========================================================= */
+
+.cornerTL,
+.cornerBR {
+  position: absolute;
+
+  width: 17px;
+  height: 17px;
+
+  pointer-events: none;
+
+  opacity: 0.45;
+}
+
+
+.cornerTL {
+  top: 8px;
+  left: 9px;
+
+  border-top:
+    1px solid
+    rgba(127, 106, 236, 0.7);
+
+  border-left:
+    1px solid
+    rgba(127, 106, 236, 0.7);
+}
+
+
+.cornerBR {
+  right: 8px;
+  bottom: 8px;
+
+  border-right:
+    1px solid
+    rgba(69, 194, 221, 0.55);
+
+  border-bottom:
+    1px solid
+    rgba(69, 194, 221, 0.55);
+}
+
+
+/* =========================================================
+   SCAN BEAM
+   ========================================================= */
+
+.scanBeam {
+  position: absolute;
+
+  z-index: 8;
+
+  left: 0;
+  right: 0;
+
+  top: 0;
+
+  height: 1px;
+
+  pointer-events: none;
+
+  opacity: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(125, 105, 245, 0.55),
+      rgba(69, 197, 233, 0.42),
+      transparent
+    );
+
+  box-shadow:
+    0 0 10px
+    rgba(99, 83, 226, 0.27);
+}
+
+
+.card:hover .scanBeam {
+  animation:
+    cardScan
+    2.8s linear infinite;
+}
+
+
+/* =========================================================
+   ENV HEADER
+   ========================================================= */
+
+.envHeader {
+  min-height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding:
+    0 24px;
+
+  border-bottom:
+    1px solid
+    rgba(111, 102, 179, 0.10);
+
+  background:
+    rgba(5, 7, 16, 0.16);
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 7px;
+
+  letter-spacing: 0.11em;
+}
+
+
+.envIdentity {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  color:
+    rgba(142, 159, 198, 0.55);
+}
+
+
+.envDot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(122, 108, 226, 0.7);
+}
+
+
+.envDotActive {
+  background:
+    rgba(70, 228, 164, 0.94);
+
+  box-shadow:
+    0 0 7px
+    rgba(70, 228, 164, 0.52);
+
+  animation:
+    statusPulse
+    1.6s ease-in-out infinite;
+}
+
+
+.envState {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color:
+    rgba(160, 157, 189, 0.55);
+}
+
+
+.envState > span {
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(135, 128, 180, 0.65);
+}
+
+
+.envStateActive {
+  color:
+    rgba(83, 219, 168, 0.68);
+}
+
+
+.envStateActive > span {
+  background:
+    rgba(70, 230, 164, 0.95);
+
+  box-shadow:
+    0 0 6px
+    rgba(70, 230, 164, 0.45);
+
+  animation:
+    statusPulse
+    1.6s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   ROLE HEADER
+   ========================================================= */
+
+.roleHeader {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  padding:
+    23px 24px 16px;
+}
+
 
 .iconWrap {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-base);
-  background: var(--brand-softer);
-  border: 1px solid var(--border-brand-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 52px;
+  height: 52px;
+
   flex-shrink: 0;
+
+  display: grid;
+
+  place-items: center;
+
   overflow: hidden;
-  transition: background 0.3s, border-color 0.3s;
+
+  border:
+    1px solid
+    rgba(121, 105, 220, 0.24);
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(102, 83, 221, 0.09),
+      rgba(58, 137, 203, 0.035)
+    );
+
+  transition:
+    border-color 0.3s,
+    background 0.3s,
+    box-shadow 0.3s;
 }
+
 
 .card:hover .iconWrap {
-  background: var(--brand-soft);
-  border-color: var(--brand);
+  border-color:
+    rgba(128, 108, 240, 0.52);
+
+  background:
+    rgba(103, 83, 222, 0.11);
+
+  box-shadow:
+    0 0 18px
+    rgba(92, 74, 218, 0.10);
 }
 
+
 .iconWrap svg {
-  width: 24px;
-  height: 24px;
-  color: var(--fg-brand-strong);
+  width: 21px;
+  height: 21px;
+
+  color:
+    rgba(167, 151, 255, 0.85);
 }
+
 
 .iconWrap img {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
 }
 
-.info { flex: 1; }
+
+.info {
+  min-width: 0;
+
+  flex: 1;
+}
+
+
+.roleLabel {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 6px;
+
+  letter-spacing: 0.11em;
+
+  color:
+    rgba(106, 169, 218, 0.5);
+}
+
 
 .title {
-  font-size: 18px;
+  margin:
+    0 0 4px;
+
+  font-size: 17px;
+
   font-weight: 700;
-  color: var(--heading);
-  margin: 0 0 2px;
+
+  line-height: 1.35;
+
+  color:
+    var(--heading);
 }
+
 
 .company {
-  font-size: 14px;
-  color: var(--fg-brand);
-  margin: 0 0 2px;
+  margin:
+    0 0 3px;
+
+  font-size: 13px;
+
+  color:
+    var(--fg-brand);
 }
 
+
 .period {
-  font-size: 12px;
-  color: var(--body-subtle);
   margin: 0;
+
+  font-size: 11px;
+
+  color:
+    var(--body-subtle);
 }
+
+
+/* =========================================================
+   JOB TIMELINE
+   ========================================================= */
+
+.jobTimeline {
+  padding:
+    0 24px 20px;
+}
+
+
+.jobTimelineLabels {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 7px;
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 6px;
+
+  letter-spacing: 0.05em;
+
+  color:
+    rgba(145, 145, 171, 0.47);
+}
+
+
+.jobTimelineLabels span:nth-child(2) {
+  color:
+    rgba(112, 161, 208, 0.48);
+}
+
+
+.jobTimelineTrack {
+  position: relative;
+
+  height: 3px;
+
+  border-radius: 5px;
+
+  background:
+    rgba(108, 100, 164, 0.13);
+}
+
+
+.jobTimelineFill {
+  position: absolute;
+
+  inset: 0;
+
+  transform:
+    scaleX(0);
+
+  transform-origin:
+    left center;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #775ff1,
+      #5998e6,
+      #4fcfcb
+    );
+}
+
+
+.visible .jobTimelineFill {
+  animation:
+    jobTimelineLoad
+    1.25s
+    cubic-bezier(.2,.75,.25,1)
+    0.6s forwards;
+}
+
+
+.startPoint,
+.endPoint {
+  position: absolute;
+
+  top: 50%;
+
+  width: 7px;
+  height: 7px;
+
+  transform:
+    translateY(-50%);
+
+  border-radius: 50%;
+
+  border:
+    2px solid #141426;
+
+  background:
+    #7c69ee;
+}
+
+
+.startPoint {
+  left: -2px;
+}
+
+
+.endPoint {
+  right: -2px;
+
+  opacity: 0;
+}
+
+
+.visible .endPoint {
+  animation:
+    endpointOnline
+    0.3s ease
+    1.7s forwards;
+}
+
+
+.endPointActive {
+  background:
+    rgba(67, 227, 162, 0.96);
+
+  box-shadow:
+    0 0 7px
+    rgba(67, 227, 162, 0.42);
+}
+
+
+/* =========================================================
+   DEPLOYMENT LOG
+   ========================================================= */
+
+.logSection {
+  padding:
+    16px 24px 21px;
+
+  border-top:
+    1px solid
+    rgba(111, 101, 177, 0.09);
+}
+
+
+.logHeader {
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-bottom: 11px;
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 6px;
+
+  letter-spacing: 0.1em;
+
+  color:
+    rgba(146, 144, 172, 0.47);
+}
+
 
 .details {
   list-style: none;
+
   display: flex;
+
   flex-direction: column;
-  gap: 6px;
+
+  gap: 7px;
+
+  margin: 0;
+
+  padding: 0;
 }
+
 
 .details li {
-  font-size: 13px;
-  color: var(--body);
-  padding-left: 16px;
-  position: relative;
+  --detail-delay: 0ms;
+
+  display: grid;
+
+  grid-template-columns:
+    27px minmax(0, 1fr) 14px;
+
+  align-items: start;
+
+  gap: 7px;
+
+  font-size: 12px;
+
+  line-height: 1.55;
+
+  color:
+    var(--body);
+
+  opacity: 0;
+
+  transform:
+    translateX(-6px);
 }
 
-.details li::before {
-  content: '>';
-  position: absolute;
-  left: 0;
-  color: var(--brand);
-  font-weight: 700;
+
+.visible .details li {
+  animation:
+    logOnline
+    0.45s ease forwards;
+
+  animation-delay:
+    var(--detail-delay);
 }
 
+
+.ok {
+  margin-top: 2px;
+
+  padding:
+    1px 3px;
+
+  border:
+    1px solid
+    rgba(70, 211, 158, 0.14);
+
+  border-radius: 3px;
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 5px;
+
+  text-align: center;
+
+  color:
+    rgba(79, 214, 164, 0.68);
+
+  background:
+    rgba(51, 181, 132, 0.035);
+}
+
+
+.detailText {
+  min-width: 0;
+}
+
+
+.detailCheck {
+  color:
+    rgba(80, 210, 162, 0.57);
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   TELEMETRY
+   ========================================================= */
+
+.telemetry {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  margin:
+    auto 24px 18px;
+
+  border:
+    1px solid
+    rgba(108, 99, 170, 0.10);
+
+  border-radius: 7px;
+
+  background:
+    rgba(6, 8, 16, 0.18);
+}
+
+
+.telemetry div {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  padding:
+    8px 9px;
+}
+
+
+.telemetry div + div {
+  border-left:
+    1px solid
+    rgba(108, 99, 170, 0.09);
+}
+
+
+.telemetry span {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 5px;
+
+  letter-spacing: 0.06em;
+
+  color:
+    rgba(133, 134, 158, 0.4);
+}
+
+
+.telemetry strong {
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 6px;
+
+  font-weight: 500;
+
+  letter-spacing: 0.05em;
+
+  color:
+    rgba(79, 207, 160, 0.58);
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.cardFooter {
+  min-height: 33px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding:
+    0 24px;
+
+  border-top:
+    1px solid
+    rgba(109, 100, 173, 0.09);
+
+  background:
+    rgba(5, 7, 14, 0.13);
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 5px;
+
+  letter-spacing: 0.06em;
+
+  color:
+    rgba(133, 135, 158, 0.37);
+}
+
+
+.cardFooter strong {
+  margin-left: auto;
+
+  font-size: 6px;
+
+  font-weight: 500;
+
+  color:
+    rgba(76, 208, 159, 0.55);
+}
+
+
+.activity {
+  display: flex;
+
+  align-items: flex-end;
+
+  gap: 2px;
+
+  height: 10px;
+}
+
+
+.activity i {
+  display: block;
+
+  width: 2px;
+
+  border-radius: 3px;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(103, 88, 220, 0.42),
+      rgba(70, 190, 223, 0.62)
+    );
+
+  animation:
+    activity
+    1.1s ease-in-out
+    infinite alternate;
+}
+
+
+.activity i:nth-child(1) {
+  height: 4px;
+}
+
+
+.activity i:nth-child(2) {
+  height: 8px;
+
+  animation-delay: -0.3s;
+}
+
+
+.activity i:nth-child(3) {
+  height: 6px;
+
+  animation-delay: -0.6s;
+}
+
+
+.activity i:nth-child(4) {
+  height: 9px;
+
+  animation-delay: -0.9s;
+}
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+@keyframes cardBoot {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(20px)
+      scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+@keyframes pipelineAppear {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+
+@keyframes pipelineFill {
+  from {
+    transform:
+      scaleX(0);
+  }
+
+  to {
+    transform:
+      scaleX(1);
+  }
+}
+
+
+@keyframes yearOnline {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+}
+
+
+@keyframes jobTimelineLoad {
+  from {
+    transform:
+      scaleX(0);
+  }
+
+  to {
+    transform:
+      scaleX(1);
+  }
+}
+
+
+@keyframes endpointOnline {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-50%)
+      scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(-50%)
+      scale(1);
+  }
+}
+
+
+@keyframes logOnline {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+
+    transform:
+      scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      scale(1.15);
+  }
+}
+
+
+@keyframes activity {
+  from {
+    opacity: 0.3;
+
+    transform:
+      scaleY(0.4);
+  }
+
+  to {
+    opacity: 0.9;
+
+    transform:
+      scaleY(1);
+  }
+}
+
+
+@keyframes cardScan {
+  0% {
+    top: 1%;
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 0.7;
+  }
+
+  88% {
+    opacity: 0.35;
+  }
+
+  100% {
+    top: 99%;
+    opacity: 0;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;
   }
+
+  .careerPipeline {
+    margin-bottom: 20px;
+  }
 }
+
+
+@media (max-width: 600px) {
+  .careerPipeline {
+    padding:
+      13px 14px 19px;
+  }
+
+  .pipelineHeader {
+    font-size: 5px;
+  }
+
+  .roleHeader {
+    padding:
+      20px 18px 14px;
+  }
+
+  .jobTimeline {
+    padding:
+      0 18px 18px;
+  }
+
+  .logSection {
+    padding:
+      15px 18px 19px;
+  }
+
+  .telemetry {
+    margin:
+      auto 18px 16px;
+  }
+
+  .cardFooter,
+  .envHeader {
+    padding:
+      0 18px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .details li {
+    font-size: 11px;
+  }
+
+  .jobTimelineLabels span:nth-child(2) {
+    display: none;
+  }
+
+  .cardFooter > span:first-child {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .careerPipeline,
+  .details li,
+  .pipelineFill,
+  .jobTimelineFill,
+  .yearNode i,
+  .endPoint,
+  .envDotActive,
+  .envStateActive > span,
+  .pipelineState i,
+  .activity i,
+  .scanBeam {
+    animation: none !important;
+  }
+
+  .card,
+  .careerPipeline,
+  .details li,
+  .yearNode i,
+  .endPoint {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pipelineFill,
+  .jobTimelineFill {
+    transform:
+      scaleX(1);
+  }
+
+  .endPoint {
+    transform:
+      translateY(-50%);
+  }
+}
+
+/* ===== TRUE HOVER SCALE START ===== */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .stage,
+  .grid {
+    overflow: visible !important;
+  }
+
+  .card {
+    scale: 1;
+
+    transform-origin: center center;
+
+    transition:
+      scale 0.32s cubic-bezier(.16,.84,.28,1),
+      border-color 0.3s,
+      box-shadow 0.3s;
+  }
+
+  .card:hover {
+    z-index: 999;
+
+    scale: 1.18;
+
+    border-color:
+      rgba(145,123,255,.72);
+
+    box-shadow:
+      0 30px 70px rgba(0,0,0,.38),
+      0 0 48px rgba(105,84,235,.22);
+  }
+
+  .activeCard:hover {
+    border-color:
+      rgba(75,225,170,.62);
+
+    box-shadow:
+      0 30px 70px rgba(0,0,0,.38),
+      0 0 48px rgba(61,201,158,.19);
+  }
+}
+
+/* ===== TRUE HOVER SCALE END ===== */
+
+/* ===== MODULE LIGHT MODE START ===== */
+
+:global(html[data-theme='light']) .careerPipeline {
+  background:
+    rgba(255,255,255,0.74);
+
+  border-color:
+    rgba(95,83,180,0.14);
+}
+
+:global(html[data-theme='light']) .card {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f6f8fc
+    );
+}
+
+:global(html[data-theme='light']) .envHeader,
+:global(html[data-theme='light']) .cardFooter {
+  background:
+    rgba(239,242,249,0.62);
+}
+
+:global(html[data-theme='light']) .telemetry {
+  background:
+    rgba(239,242,249,0.55);
+}
+
+:global(html[data-theme='light']) .roleLabel,
+:global(html[data-theme='light']) .logHeader,
+:global(html[data-theme='light']) .jobTimelineLabels,
+:global(html[data-theme='light']) .telemetry span,
+:global(html[data-theme='light']) .cardFooter {
+  color:
+    #788196;
+}
+
+/* ===== MODULE LIGHT MODE END ===== */

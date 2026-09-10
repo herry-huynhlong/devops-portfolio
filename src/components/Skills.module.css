@@ -1,91 +1,1544 @@
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+/* ==========================================================
+   STAGE
+   ========================================================== */
+
+.stage {
+  position: relative;
+
+  isolation: isolate;
+
+  min-height: 0;
 }
+
+
+.backgroundGrid {
+  position: absolute;
+
+  inset: -55px -25px;
+
+  z-index: 0;
+
+  pointer-events: none;
+
+  opacity: 0.18;
+
+  background-image:
+    linear-gradient(
+      rgba(112, 104, 194, 0.07) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(112, 104, 194, 0.07) 1px,
+      transparent 1px
+    );
+
+  background-size:
+    38px 38px;
+
+  mask-image:
+    radial-gradient(
+      ellipse at center,
+      black 0%,
+      rgba(0, 0, 0, 0.72) 55%,
+      transparent 86%
+    );
+
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse at center,
+      black 0%,
+      rgba(0, 0, 0, 0.72) 55%,
+      transparent 86%
+    );
+}
+
+
+.backgroundGlow {
+  position: absolute;
+
+  z-index: 0;
+
+  width: 440px;
+  height: 300px;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
+
+  border-radius: 50%;
+
+  opacity: 0.48;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(86, 69, 200, 0.08),
+      rgba(47, 131, 203, 0.025) 42%,
+      transparent 72%
+    );
+
+  filter:
+    blur(12px);
+}
+
+
+/* ==========================================================
+   GRID
+   ========================================================== */
+
+.grid {
+  position: relative;
+
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  column-gap: 20px;
+
+  row-gap: 20px;
+}
+
+
+/*
+ * Với đúng 4 category, tạo khoảng giữa
+ * cho DEVOPS CORE.
+ */
+.withCore .grid {
+  row-gap: 86px;
+}
+
+
+/* ==========================================================
+   SKILL CARD
+   ========================================================== */
 
 .category {
-  background: var(--neutral-primary-medium);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  padding: 24px;
+  --card-delay: 0ms;
+
   position: relative;
+
+  min-height: 185px;
+
+  display: flex;
+
+  flex-direction: column;
+
   overflow: hidden;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s;
-}
 
-.category::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--gradient-1);
+  padding:
+    19px 22px 0;
+
+  border:
+    1px solid rgba(116, 104, 197, 0.22);
+
+  border-radius:
+    var(--radius-lg);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 17, 34, 0.94),
+      rgba(11, 14, 27, 0.92)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.018),
+    0 15px 45px rgba(0, 0, 0, 0.08);
+
   opacity: 0;
-  transition: opacity 0.3s;
+
+  transform:
+    translateY(18px)
+    scale(0.992);
+
+  transition:
+    border-color 0.35s,
+    box-shadow 0.35s,
+    transform 0.35s;
 }
 
-.category:hover::after { opacity: 1; }
+
+.visible .category {
+  animation:
+    cardOnline
+    0.7s
+    cubic-bezier(.2,.75,.25,1)
+    forwards;
+
+  animation-delay:
+    var(--card-delay);
+}
+
+
+.category::before {
+  content: '';
+
+  position: absolute;
+
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+
+  width: 2px;
+
+  border-radius:
+    0 4px 4px 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      #795fff,
+      #4cbbe8,
+      transparent
+    );
+
+  opacity: 0.45;
+
+  transition:
+    opacity 0.3s;
+}
+
 
 .category:hover {
-  border-color: var(--border-brand);
-  box-shadow: var(--glow-brand);
-  transform: translateY(-4px);
+  transform:
+    translateY(-4px);
+
+  border-color:
+    rgba(128, 111, 246, 0.53);
+
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.17),
+    0 0 28px rgba(89, 72, 213, 0.08),
+    inset 0 0 40px rgba(91, 75, 204, 0.025);
 }
+
+
+.category:hover::before {
+  opacity: 0.95;
+}
+
+
+.cardGlow {
+  position: absolute;
+
+  z-index: 0;
+
+  width: 260px;
+  height: 190px;
+
+  right: -120px;
+  top: -100px;
+
+  pointer-events: none;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(100, 80, 224, 0.11),
+      rgba(51, 151, 221, 0.025) 43%,
+      transparent 70%
+    );
+
+  opacity: 0;
+
+  transition:
+    opacity 0.35s;
+}
+
+
+.category:hover .cardGlow {
+  opacity: 1;
+}
+
+
+/* ==========================================================
+   SCANNER
+   ========================================================== */
+
+.scanLine {
+  position: absolute;
+
+  z-index: 8;
+
+  left: 0;
+  right: 0;
+
+  top: -5%;
+
+  height: 1px;
+
+  pointer-events: none;
+
+  opacity: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(124, 103, 255, 0.52),
+      rgba(71, 199, 235, 0.39),
+      transparent
+    );
+
+  box-shadow:
+    0 0 9px
+    rgba(105, 89, 237, 0.22);
+}
+
+
+.category:hover .scanLine {
+  animation:
+    cardScan
+    2.7s
+    linear
+    infinite;
+}
+
+
+/* ==========================================================
+   CARD HEADER
+   ========================================================== */
+
+.categoryHeader {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content:
+    space-between;
+
+  gap: 15px;
+}
+
+
+.nodeName {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 5px;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 7px;
+
+  letter-spacing: 0.12em;
+
+  color:
+    rgba(137, 178, 224, 0.56);
+}
+
+
+.nodeDot {
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(83, 201, 244, 0.9);
+
+  box-shadow:
+    0 0 7px
+    rgba(83, 201, 244, 0.55);
+
+  animation:
+    statusPulse
+    1.8s
+    ease-in-out
+    infinite;
+}
+
 
 .categoryLabel {
-  font-size: 11px;
+  margin: 0;
+
+  font-size: 12px;
+
   font-weight: 700;
+
   text-transform: uppercase;
+
   letter-spacing: 0.1em;
-  color: var(--fg-brand);
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-default);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+
+  color:
+    var(--fg-brand);
 }
 
-.count {
-  font-size: 10px;
-  color: var(--body-subtle);
-  font-weight: 400;
-  letter-spacing: 0.04em;
+
+.categoryStatus {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding:
+    4px 7px;
+
+  border:
+    1px solid rgba(66, 211, 160, 0.12);
+
+  border-radius: 5px;
+
+  background:
+    rgba(55, 177, 128, 0.035);
+
+  white-space: nowrap;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 6px;
+
+  letter-spacing: 0.08em;
+
+  color:
+    rgba(93, 217, 167, 0.63);
 }
+
+
+.liveDot {
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(74, 230, 164, 0.9);
+
+  box-shadow:
+    0 0 6px
+    rgba(74, 230, 164, 0.47);
+
+  animation:
+    statusPulse
+    1.6s
+    ease-in-out
+    infinite;
+}
+
+
+/* ==========================================================
+   DIVIDER
+   ========================================================== */
+
+.headerDivider {
+  position: relative;
+
+  z-index: 2;
+
+  height: 1px;
+
+  margin:
+    13px 0 13px;
+
+  overflow: hidden;
+
+  background:
+    rgba(112, 103, 178, 0.11);
+}
+
+
+.headerDivider span {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #785fff,
+      #4cbfea,
+      transparent
+    );
+}
+
+
+.visible .headerDivider span {
+  animation:
+    dividerLoad
+    1.15s
+    ease
+    0.5s
+    forwards;
+}
+
+
+/* ==========================================================
+   SKILLS
+   ========================================================== */
 
 .skillsList {
+  position: relative;
+
+  z-index: 2;
+
   display: flex;
+
   flex-wrap: wrap;
-  gap: 8px;
+
+  gap: 7px;
+
+  min-height: 30px;
 }
+
 
 .skill {
+  --skill-delay: 0ms;
+
   display: inline-flex;
+
   align-items: center;
+
   gap: 6px;
-  font-size: 11px;
-  font-weight: 500;
+
+  padding:
+    6px 10px;
+
+  border:
+    1px solid rgba(111, 103, 171, 0.17);
+
+  border-radius: 6px;
+
+  background:
+    rgba(7, 9, 18, 0.36);
+
+  font-size: 10px;
+
+  font-weight: 550;
+
+  letter-spacing: 0.035em;
+
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  background: var(--neutral-primary-soft);
-  border: 1px solid var(--border-default-subtle);
-  color: var(--body);
+
+  color:
+    rgba(194, 194, 218, 0.78);
+
   cursor: default;
-  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.2s, box-shadow 0.25s;
+
+  opacity: 0;
+
+  transform:
+    translateY(6px);
+
+  transition:
+    color 0.25s,
+    background 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s,
+    transform 0.25s;
 }
+
+
+.visible .skill {
+  animation:
+    skillBoot
+    0.45s
+    ease
+    forwards;
+
+  animation-delay:
+    var(--skill-delay);
+}
+
+
+.skillIndicator {
+  font-size: 6px;
+
+  color:
+    rgba(106, 99, 218, 0.63);
+
+  transition:
+    color 0.25s,
+    text-shadow 0.25s;
+}
+
 
 .skill:hover {
-  background: var(--brand-softer);
-  border-color: var(--border-brand);
-  color: var(--fg-brand-strong);
-  transform: translateY(-3px);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  transform:
+    translateY(-2px);
+
+  color:
+    rgba(231, 230, 255, 0.96);
+
+  border-color:
+    rgba(123, 105, 243, 0.46);
+
+  background:
+    rgba(98, 79, 213, 0.09);
+
+  box-shadow:
+    0 0 18px
+    rgba(91, 75, 220, 0.13);
 }
 
-@media (max-width: 767px) {
-  .grid { grid-template-columns: 1fr; }
+
+.skill:hover .skillIndicator {
+  color:
+    rgba(104, 205, 242, 0.95);
+
+  text-shadow:
+    0 0 6px
+    rgba(104, 205, 242, 0.65);
 }
+
+
+/* ==========================================================
+   STACK FLOW
+   ========================================================== */
+
+.flowArea {
+  position: relative;
+
+  z-index: 2;
+
+  margin-top: 15px;
+
+  padding-top: 10px;
+
+  border-top:
+    1px solid rgba(113, 105, 174, 0.08);
+}
+
+
+.flowHeader {
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  margin-bottom: 7px;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 6px;
+
+  letter-spacing: 0.1em;
+
+  color:
+    rgba(143, 142, 169, 0.46);
+}
+
+
+.flow {
+  display: flex;
+
+  align-items: center;
+
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+
+.flowPart {
+  display: flex;
+
+  align-items: center;
+
+  min-width: 0;
+}
+
+
+.flowNode {
+  max-width: 105px;
+
+  overflow: hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space: nowrap;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 7px;
+
+  color:
+    rgba(154, 151, 190, 0.62);
+}
+
+
+.flowArrow {
+  position: relative;
+
+  margin:
+    0 7px;
+
+  color:
+    rgba(106, 92, 226, 0.55);
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  animation:
+    arrowPulse
+    1.7s
+    ease-in-out
+    infinite;
+}
+
+
+.flowSuccess {
+  margin-left:
+    auto;
+
+  padding-left:
+    8px;
+
+  color:
+    rgba(80, 217, 162, 0.67);
+
+  font-family:
+    ui-monospace,
+    monospace;
+}
+
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+
+.cardFooter {
+  position: relative;
+
+  z-index: 2;
+
+  min-height: 31px;
+
+  margin:
+    auto -22px 0;
+
+  padding:
+    0 22px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  border-top:
+    1px solid rgba(111, 102, 178, 0.09);
+
+  background:
+    rgba(5, 7, 14, 0.13);
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 6px;
+
+  letter-spacing: 0.07em;
+
+  color:
+    rgba(139, 139, 164, 0.42);
+}
+
+
+.footerCode {
+  color:
+    rgba(116, 158, 208, 0.48);
+}
+
+
+.cardFooter strong {
+  margin-left:
+    auto;
+
+  font-weight: 500;
+
+  color:
+    rgba(77, 210, 158, 0.55);
+}
+
+
+.activity {
+  display: flex;
+
+  align-items: flex-end;
+
+  gap: 2px;
+
+  height: 11px;
+}
+
+
+.activity i {
+  display: block;
+
+  width: 2px;
+
+  border-radius: 2px;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(102, 87, 220, 0.45),
+      rgba(77, 190, 224, 0.64)
+    );
+
+  animation:
+    activityBar
+    1.1s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+.activity i:nth-child(1) {
+  height: 4px;
+}
+
+
+.activity i:nth-child(2) {
+  height: 8px;
+
+  animation-delay:
+    -0.2s;
+}
+
+
+.activity i:nth-child(3) {
+  height: 6px;
+
+  animation-delay:
+    -0.5s;
+}
+
+
+.activity i:nth-child(4) {
+  height: 10px;
+
+  animation-delay:
+    -0.7s;
+}
+
+
+.activity i:nth-child(5) {
+  height: 5px;
+
+  animation-delay:
+    -0.35s;
+}
+
+
+/* ==========================================================
+   CENTRAL TOPOLOGY
+   ========================================================== */
+
+.topologyLines {
+  position: absolute;
+
+  z-index: 1;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+
+  overflow: visible;
+}
+
+
+.topologyLines line {
+  fill: none;
+
+  stroke:
+    rgba(108, 93, 219, 0.19);
+
+  stroke-width: 1;
+
+  vector-effect:
+    non-scaling-stroke;
+
+  stroke-dasharray:
+    5 9;
+
+  animation:
+    networkFlow
+    5s
+    linear
+    infinite;
+}
+
+
+.topologyLines line:nth-child(2) {
+  animation-delay:
+    -1.2s;
+}
+
+
+.topologyLines line:nth-child(3) {
+  animation-delay:
+    -2.4s;
+}
+
+
+.topologyLines line:nth-child(4) {
+  animation-delay:
+    -3.6s;
+}
+
+
+.topologyLines circle {
+  fill:
+    rgba(83, 193, 234, 0.72);
+
+  stroke:
+    rgba(83, 193, 234, 0.25);
+
+  stroke-width: 8;
+
+  vector-effect:
+    non-scaling-stroke;
+
+  animation:
+    endpointPulse
+    2.1s
+    ease-in-out
+    infinite;
+}
+
+
+.core {
+  position: absolute;
+
+  z-index: 5;
+
+  left: 50%;
+  top: 50%;
+
+  width: 154px;
+  height: 61px;
+
+  transform:
+    translate(-50%, -50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  overflow: hidden;
+
+  border:
+    1px solid rgba(122, 105, 236, 0.34);
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(19, 18, 39, 0.98),
+      rgba(9, 13, 27, 0.97)
+    );
+
+  box-shadow:
+    0 0 28px
+    rgba(88, 69, 217, 0.10),
+    inset 0 0 24px
+    rgba(93, 73, 217, 0.035);
+
+  opacity: 0;
+
+  transform:
+    translate(-50%, -50%)
+    scale(0.78);
+}
+
+
+.visible .core {
+  animation:
+    coreBoot
+    0.65s
+    cubic-bezier(.2,.8,.25,1)
+    0.65s
+    forwards;
+}
+
+
+.corePulse {
+  position: absolute;
+
+  width: 110px;
+  height: 110px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(102, 83, 234, 0.13),
+      transparent 68%
+    );
+
+  animation:
+    coreBreath
+    3s
+    ease-in-out
+    infinite;
+}
+
+
+.coreTop,
+.core strong,
+.coreOnline {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+.coreTop {
+  margin-bottom: 3px;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 6px;
+
+  letter-spacing: 0.16em;
+
+  color:
+    rgba(124, 169, 230, 0.57);
+}
+
+
+.core strong {
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  color:
+    rgba(213, 210, 239, 0.84);
+}
+
+
+.coreOnline {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  margin-top: 4px;
+
+  font-family:
+    ui-monospace,
+    monospace;
+
+  font-size: 5px;
+
+  letter-spacing: 0.1em;
+
+  color:
+    rgba(80, 214, 161, 0.59);
+}
+
+
+.coreOnline i {
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(73, 232, 163, 0.93);
+
+  box-shadow:
+    0 0 7px
+    rgba(73, 232, 163, 0.55);
+
+  animation:
+    statusPulse
+    1.5s
+    ease-in-out
+    infinite;
+}
+
+
+/* ==========================================================
+   ANIMATIONS
+   ========================================================== */
+
+@keyframes cardOnline {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+@keyframes skillBoot {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+
+@keyframes dividerLoad {
+  from {
+    width: 0;
+    opacity: 0.3;
+  }
+
+  to {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+
+
+@keyframes coreBoot {
+  from {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      scale(0.78);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+}
+
+
+@keyframes networkFlow {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: -56;
+  }
+}
+
+
+@keyframes endpointPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.95;
+  }
+}
+
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+
+    transform:
+      scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      scale(1.15);
+  }
+}
+
+
+@keyframes coreBreath {
+  0%,
+  100% {
+    opacity: 0.35;
+
+    transform:
+      scale(0.85);
+  }
+
+  50% {
+    opacity: 0.9;
+
+    transform:
+      scale(1.08);
+  }
+}
+
+
+@keyframes activityBar {
+  from {
+    transform:
+      scaleY(0.35);
+
+    opacity: 0.35;
+  }
+
+  to {
+    transform:
+      scaleY(1);
+
+    opacity: 0.9;
+  }
+}
+
+
+@keyframes arrowPulse {
+  0%,
+  100% {
+    opacity: 0.25;
+
+    transform:
+      translateX(-1px);
+  }
+
+  50% {
+    opacity: 0.95;
+
+    transform:
+      translateX(2px);
+  }
+}
+
+
+@keyframes cardScan {
+  0% {
+    top: 1%;
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 0.65;
+  }
+
+  88% {
+    opacity: 0.35;
+  }
+
+  100% {
+    top: 99%;
+    opacity: 0;
+  }
+}
+
+
+/* ==========================================================
+   TABLET / MOBILE
+   ========================================================== */
+
+@media (max-width: 767px) {
+  .grid,
+  .withCore .grid {
+    grid-template-columns: 1fr;
+
+    row-gap: 16px;
+  }
+
+  .core,
+  .topologyLines {
+    display: none;
+  }
+
+  .category {
+    min-height: 175px;
+
+    padding:
+      18px 18px 0;
+  }
+
+  .cardFooter {
+    margin:
+      auto -18px 0;
+
+    padding:
+      0 18px;
+  }
+
+  .categoryStatus {
+    font-size: 5px;
+  }
+
+  .flowNode {
+    max-width: 80px;
+  }
+
+  .backgroundGrid {
+    inset:
+      -20px -10px;
+  }
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .category,
+  .skill,
+  .core,
+  .headerDivider span,
+  .topologyLines line,
+  .topologyLines circle,
+  .nodeDot,
+  .liveDot,
+  .corePulse,
+  .coreOnline i,
+  .activity i,
+  .flowArrow,
+  .scanLine {
+    animation: none !important;
+  }
+
+  .category,
+  .skill,
+  .core {
+    opacity: 1;
+  }
+
+  .category,
+  .skill {
+    transform: none;
+  }
+
+  .core {
+    transform:
+      translate(-50%, -50%);
+  }
+
+  .headerDivider span {
+    width: 100%;
+  }
+}
+
+/* ===== TRUE HOVER SCALE START ===== */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .stage,
+  .grid {
+    overflow: visible !important;
+  }
+
+  .category {
+    scale: 1;
+
+    transform-origin: center center;
+
+    transition:
+      scale 0.32s cubic-bezier(.16,.84,.28,1),
+      border-color 0.3s,
+      box-shadow 0.3s;
+  }
+
+  .category:hover {
+    z-index: 999;
+
+    scale: 1.18;
+
+    border-color:
+      rgba(145,123,255,.75);
+
+    box-shadow:
+      0 30px 70px rgba(0,0,0,.38),
+      0 0 48px rgba(105,84,235,.22);
+  }
+
+  .skill {
+    scale: 1;
+
+    transition:
+      scale 0.2s ease,
+      background 0.25s,
+      border-color 0.25s,
+      color 0.25s,
+      box-shadow 0.25s;
+  }
+
+  .skill:hover {
+    z-index: 1000;
+
+    scale: 1.12;
+  }
+
+  /*
+   * Core đang dùng transform để căn chính giữa:
+   * translate(-50%, -50%)
+   *
+   * Dùng scale property riêng nên không phá căn giữa.
+   */
+  .core {
+    scale: 1;
+
+    transition:
+      scale 0.28s ease,
+      box-shadow 0.28s;
+  }
+
+  .core:hover {
+    z-index: 1000;
+
+    scale: 1.18;
+
+    box-shadow:
+      0 0 50px rgba(105,84,235,.28);
+  }
+}
+
+/* ===== TRUE HOVER SCALE END ===== */
+
+/* ===== MODULE LIGHT MODE START ===== */
+
+:global(html[data-theme='light']) .category {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f6f8fc
+    );
+}
+
+:global(html[data-theme='light']) .skill {
+  background:
+    rgba(240,243,249,0.85);
+
+  color:
+    #51596c;
+
+  border-color:
+    rgba(96,86,165,0.14);
+}
+
+:global(html[data-theme='light']) .flowArea {
+  border-color:
+    rgba(95,87,162,0.10);
+}
+
+:global(html[data-theme='light']) .flowNode,
+:global(html[data-theme='light']) .flowHeader,
+:global(html[data-theme='light']) .nodeName,
+:global(html[data-theme='light']) .cardFooter {
+  color:
+    #788196;
+}
+
+:global(html[data-theme='light']) .cardFooter {
+  background:
+    rgba(239,242,249,0.60);
+}
+
+:global(html[data-theme='light']) .core {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #eef2fa
+    );
+
+  border-color:
+    rgba(101,86,210,0.27);
+
+  box-shadow:
+    0 10px 25px
+    rgba(42,50,75,0.10);
+}
+
+:global(html[data-theme='light']) .core strong {
+  color:
+    #30364a;
+}
+
+/* ===== MODULE LIGHT MODE END ===== */

@@ -1,7 +1,14 @@
 'use client'
 
 import { ContentProvider } from '@/lib/content-context'
+import ThemeToggle from './ThemeToggle'
 
 export default function ClientLayout({ children }) {
-  return <ContentProvider>{children}</ContentProvider>
+  return (
+    <ContentProvider>
+      <ThemeToggle />
+
+      {children}
+    </ContentProvider>
+  )
 }

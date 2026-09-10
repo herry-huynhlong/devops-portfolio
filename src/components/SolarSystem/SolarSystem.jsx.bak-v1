@@ -1,0 +1,1070 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import styles from "./SolarSystem.module.css";
+
+const PLANETS = [
+  {
+    name: "Mercury",
+    orbit: 0.17,
+    radius: 4,
+    speed: 0.55,
+    angle: 0.2,
+    colors: ["#d8d4cd", "#706a65"],
+  },
+  {
+    name: "Venus",
+    orbit: 0.25,
+    radius: 6,
+    speed: 0.44,
+    angle: 1.1,
+    colors: ["#ffd98c", "#a86d36"],
+  },
+  {
+    name: "Earth",
+    orbit: 0.34,
+    radius: 7,
+    speed: 0.36,
+    angle: 2.25,
+    colors: ["#7bdcff", "#2455bc"],
+  },
+  {
+    name: "Mars",
+    orbit: 0.43,
+    radius: 5.5,
+    speed: 0.3,
+    angle: 3.0,
+    colors: ["#ff9a71", "#843b2c"],
+  },
+  {
+    name: "Jupiter",
+    orbit: 0.57,
+    radius: 13,
+    speed: 0.21,
+    angle: 4.0,
+    colors: ["#f1d0ae", "#9e684c"],
+  },
+  {
+    name: "Saturn",
+    orbit: 0.7,
+    radius: 11,
+    speed: 0.17,
+    angle: 5.0,
+    colors: ["#f5dfa1", "#a98a57"],
+    ring: true,
+  },
+  {
+    name: "Uranus",
+    orbit: 0.83,
+    radius: 8.5,
+    speed: 0.13,
+    angle: 5.8,
+    colors: ["#c4f8ff", "#55a5bd"],
+  },
+  {
+    name: "Neptune",
+    orbit: 0.97,
+    radius: 8.5,
+    speed: 0.1,
+    angle: 0.7,
+    colors: ["#70aaff", "#294ba5"],
+  },
+];
+
+export default function SolarSystem() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const parent = canvas.parentElement;
+
+    if (!ctx || !parent) return;
+
+    /*
+     * Ép container chứa SolarSystem thành vùng Hero.
+     * Không cần bạn sửa CSS parent bằng tay.
+     */
+    const oldPosition = parent.style.position;
+    const oldOverflow = parent.style.overflow;
+    const computedPosition = window.getComputedStyle(parent).position;
+
+    if (computedPosition === "static") {
+      parent.style.position = "relative";
+    }
+
+    parent.style.overflow = "hidden";
+
+    /*
+     * Đưa các sibling khác lên trên canvas.
+     */
+    const modifiedSiblings = [];
+
+    Array.from(parent.children).forEach((child) => {
+      if (child === canvas) return;
+
+      const style = window.getComputedStyle(child);
+
+      if (style.position === "static") {
+        modifiedSiblings.push({
+          element: child,
+          position: child.style.position,
+          zIndex: child.style.zIndex,
+        });
+
+        child.style.position = "relative";
+        child.style.zIndex = "2";
+      }
+    });
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let maxOrbit = 300;
+
+    let animationId = null;
+    let lastTime = performance.now();
+
+    let hovered = null;
+    let sunDestroyed = false;
+
+    let stars = [];
+    const particles = [];
+    const shockwaves = [];
+
+    const sun = {
+      x: 0,
+      y: 0,
+      radius: 34,
+      alive: true,
+    };
+
+    const planets = PLANETS.map((planet) => ({
+      ...planet,
+      alive: true,
+      mode: "orbit",
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      hover: 0,
+    }));
+
+    function createStars() {
+      const amount = Math.min(
+        260,
+        Math.max(100, Math.floor((width * height) / 6000))
+      );
+
+      stars = Array.from({ length: amount }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.15 + 0.2,
+        alpha: Math.random() * 0.6 + 0.15,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 1.5 + 0.4,
+      }));
+    }
+
+    function orbitPosition(planet) {
+      const orbitX = maxOrbit * planet.orbit;
+
+      /*
+       * Quỹ đạo dẹt để tạo cảm giác perspective.
+       */
+      const orbitY = orbitX * 0.43;
+
+      return {
+        x: sun.x + Math.cos(planet.angle) * orbitX,
+        y: sun.y + Math.sin(planet.angle) * orbitY,
+      };
+    }
+
+    function updateOrbitPositions() {
+      planets.forEach((planet) => {
+        if (!planet.alive || planet.mode !== "orbit") return;
+
+        const pos = orbitPosition(planet);
+
+        planet.x = pos.x;
+        planet.y = pos.y;
+      });
+    }
+
+    function resize() {
+      const rect = parent.getBoundingClientRect();
+
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const mobile = width < 768;
+
+      /*
+       * Desktop lệch hệ mặt trời sang phải
+       * để không che HUỲNH LONG.
+       */
+      sun.x = width * (mobile ? 0.5 : 0.72);
+      sun.y = height * (mobile ? 0.6 : 0.51);
+
+      sun.radius = Math.max(
+        25,
+        Math.min(39, Math.min(width, height) * 0.043)
+      );
+
+      maxOrbit = Math.min(
+        width * (mobile ? 0.48 : 0.39),
+        height * 0.43
+      );
+
+      createStars();
+      updateOrbitPositions();
+    }
+
+    function drawStars(now) {
+      ctx.save();
+
+      stars.forEach((star) => {
+        const pulse =
+          0.72 +
+          Math.sin(now * 0.001 * star.speed + star.phase) * 0.28;
+
+        ctx.globalAlpha = star.alpha * pulse;
+        ctx.fillStyle = "#d3dcff";
+
+        ctx.beginPath();
+        ctx.arc(
+          star.x,
+          star.y,
+          star.radius,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    function drawOrbits() {
+      if (sunDestroyed) return;
+
+      ctx.save();
+
+      planets.forEach((planet) => {
+        if (!planet.alive || planet.mode !== "orbit") return;
+
+        const orbitX = maxOrbit * planet.orbit;
+        const orbitY = orbitX * 0.43;
+
+        ctx.strokeStyle = "rgba(140, 130, 255, 0.14)";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.ellipse(
+          sun.x,
+          sun.y,
+          orbitX,
+          orbitY,
+          0,
+          0,
+          Math.PI * 2
+        );
+        ctx.stroke();
+      });
+
+      ctx.restore();
+    }
+
+    function drawSun() {
+      if (!sun.alive) return;
+
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+
+      const glow = ctx.createRadialGradient(
+        sun.x,
+        sun.y,
+        0,
+        sun.x,
+        sun.y,
+        sun.radius * 4.5
+      );
+
+      glow.addColorStop(0, "rgba(255,250,194,0.95)");
+      glow.addColorStop(0.2, "rgba(255,190,68,0.55)");
+      glow.addColorStop(0.55, "rgba(255,100,30,0.15)");
+      glow.addColorStop(1, "rgba(255,80,20,0)");
+
+      ctx.fillStyle = glow;
+
+      ctx.beginPath();
+      ctx.arc(
+        sun.x,
+        sun.y,
+        sun.radius * 4.5,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      const body = ctx.createRadialGradient(
+        sun.x - sun.radius * 0.3,
+        sun.y - sun.radius * 0.3,
+        sun.radius * 0.08,
+        sun.x,
+        sun.y,
+        sun.radius
+      );
+
+      body.addColorStop(0, "#fffde1");
+      body.addColorStop(0.25, "#ffd95f");
+      body.addColorStop(0.7, "#ff8a2c");
+      body.addColorStop(1, "#e54819");
+
+      ctx.fillStyle = body;
+
+      ctx.beginPath();
+      ctx.arc(
+        sun.x,
+        sun.y,
+        sun.radius,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.restore();
+
+      if (hovered?.type === "sun") {
+        drawHoverRing(
+          sun.x,
+          sun.y,
+          sun.radius + 9
+        );
+
+        drawTooltip(
+          sun.x,
+          sun.y - sun.radius - 27,
+          "SUN · CLICK TO DESTROY"
+        );
+      }
+    }
+
+    function drawPlanet(planet) {
+      if (!planet.alive) return;
+
+      const scale = 1 + planet.hover * 0.25;
+      const radius = planet.radius * scale;
+
+      if (planet.ring) {
+        ctx.save();
+
+        ctx.translate(planet.x, planet.y);
+        ctx.rotate(-0.2);
+
+        ctx.strokeStyle = `rgba(238,220,178,${
+          0.48 + planet.hover * 0.3
+        })`;
+
+        ctx.lineWidth = Math.max(1, radius * 0.22);
+
+        ctx.beginPath();
+        ctx.ellipse(
+          0,
+          0,
+          radius * 1.9,
+          radius * 0.55,
+          0,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      ctx.save();
+
+      ctx.shadowBlur = 8 + planet.hover * 15;
+      ctx.shadowColor = planet.colors[0];
+
+      const gradient = ctx.createRadialGradient(
+        planet.x - radius * 0.35,
+        planet.y - radius * 0.35,
+        radius * 0.05,
+        planet.x,
+        planet.y,
+        radius
+      );
+
+      gradient.addColorStop(0, "#ffffff");
+      gradient.addColorStop(0.15, planet.colors[0]);
+      gradient.addColorStop(1, planet.colors[1]);
+
+      ctx.fillStyle = gradient;
+
+      ctx.beginPath();
+      ctx.arc(
+        planet.x,
+        planet.y,
+        radius,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.restore();
+
+      if (planet.hover > 0.35) {
+        drawHoverRing(
+          planet.x,
+          planet.y,
+          radius + 6
+        );
+
+        drawTooltip(
+          planet.x,
+          planet.y - radius - 24,
+          `${planet.name.toUpperCase()} · CLICK TO EXPLODE`
+        );
+      }
+    }
+
+    function drawHoverRing(x, y, radius) {
+      ctx.save();
+
+      ctx.strokeStyle = "rgba(151,136,255,0.85)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 5]);
+
+      ctx.beginPath();
+      ctx.arc(
+        x,
+        y,
+        radius,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function roundedRect(
+      context,
+      x,
+      y,
+      w,
+      h,
+      radius
+    ) {
+      const r = Math.min(radius, w / 2, h / 2);
+
+      context.beginPath();
+      context.moveTo(x + r, y);
+
+      context.arcTo(
+        x + w,
+        y,
+        x + w,
+        y + h,
+        r
+      );
+
+      context.arcTo(
+        x + w,
+        y + h,
+        x,
+        y + h,
+        r
+      );
+
+      context.arcTo(
+        x,
+        y + h,
+        x,
+        y,
+        r
+      );
+
+      context.arcTo(
+        x,
+        y,
+        x + w,
+        y,
+        r
+      );
+
+      context.closePath();
+    }
+
+    function drawTooltip(x, y, text) {
+      ctx.save();
+
+      ctx.font =
+        "600 10px Inter, Arial, sans-serif";
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const paddingX = 9;
+      const textWidth = ctx.measureText(text).width;
+
+      const boxWidth = textWidth + paddingX * 2;
+      const boxHeight = 24;
+
+      const boxX = Math.max(
+        8,
+        Math.min(
+          width - boxWidth - 8,
+          x - boxWidth / 2
+        )
+      );
+
+      const boxY = Math.max(
+        8,
+        y - boxHeight / 2
+      );
+
+      ctx.fillStyle = "rgba(9,9,20,0.9)";
+      ctx.strokeStyle =
+        "rgba(151,136,255,0.42)";
+
+      roundedRect(
+        ctx,
+        boxX,
+        boxY,
+        boxWidth,
+        boxHeight,
+        7
+      );
+
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#eeeaff";
+
+      ctx.fillText(
+        text,
+        boxX + boxWidth / 2,
+        boxY + boxHeight / 2
+      );
+
+      ctx.restore();
+    }
+
+    function explodeAt(
+      x,
+      y,
+      colors,
+      count,
+      power,
+      shockSize
+    ) {
+      for (let i = 0; i < count; i++) {
+        const angle =
+          Math.random() * Math.PI * 2;
+
+        const speed =
+          power *
+          (0.3 + Math.random() * 0.8);
+
+        particles.push({
+          x,
+          y,
+
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+
+          size: Math.random() * 3 + 0.7,
+
+          life: 0.6 + Math.random() * 0.8,
+          maxLife: 1.4,
+
+          color:
+            colors[
+              Math.floor(Math.random() * colors.length)
+            ],
+        });
+      }
+
+      shockwaves.push({
+        x,
+        y,
+
+        radius: 5,
+        maxRadius: shockSize,
+
+        life: 0.8,
+        maxLife: 0.8,
+
+        color: colors[0],
+      });
+    }
+
+    function explodePlanet(planet) {
+      if (!planet.alive) return;
+
+      explodeAt(
+        planet.x,
+        planet.y,
+        [
+          planet.colors[0],
+          planet.colors[1],
+          "#ffffff",
+        ],
+        65,
+        140,
+        65
+      );
+
+      planet.alive = false;
+
+      if (hovered?.planet === planet) {
+        hovered = null;
+      }
+    }
+
+    function explodeSun() {
+      if (!sun.alive) return;
+
+      sun.alive = false;
+      sunDestroyed = true;
+      hovered = null;
+
+      explodeAt(
+        sun.x,
+        sun.y,
+        [
+          "#fffbd5",
+          "#ffd75f",
+          "#ff8a2b",
+          "#ff4d1c",
+        ],
+        320,
+        280,
+        Math.max(width, height) * 0.3
+      );
+
+      planets.forEach((planet) => {
+        if (!planet.alive) return;
+
+        if (planet.mode === "orbit") {
+          const pos = orbitPosition(planet);
+
+          planet.x = pos.x;
+          planet.y = pos.y;
+        }
+
+        planet.mode = "escape";
+
+        const dx = planet.x - sun.x;
+        const dy = planet.y - sun.y;
+
+        const length =
+          Math.hypot(dx, dy) || 1;
+
+        const nx = dx / length;
+        const ny = dy / length;
+
+        /*
+         * Vector tiếp tuyến của quỹ đạo.
+         */
+        const tx = -ny;
+        const ty = nx;
+
+        const radialSpeed =
+          65 + planet.orbit * 65;
+
+        const tangentSpeed =
+          35 + planet.speed * 80;
+
+        planet.vx =
+          nx * radialSpeed +
+          tx * tangentSpeed;
+
+        planet.vy =
+          ny * radialSpeed +
+          ty * tangentSpeed;
+      });
+    }
+
+    function updateParticles(dt) {
+      for (
+        let i = particles.length - 1;
+        i >= 0;
+        i--
+      ) {
+        const particle = particles[i];
+
+        particle.life -= dt;
+
+        if (particle.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        particle.x += particle.vx * dt;
+        particle.y += particle.vy * dt;
+
+        particle.vx *= Math.pow(
+          0.985,
+          dt * 60
+        );
+
+        particle.vy *= Math.pow(
+          0.985,
+          dt * 60
+        );
+      }
+
+      for (
+        let i = shockwaves.length - 1;
+        i >= 0;
+        i--
+      ) {
+        const wave = shockwaves[i];
+
+        wave.life -= dt;
+
+        if (wave.life <= 0) {
+          shockwaves.splice(i, 1);
+          continue;
+        }
+
+        const progress =
+          1 - wave.life / wave.maxLife;
+
+        wave.radius =
+          5 +
+          (wave.maxRadius - 5) *
+            (1 -
+              Math.pow(
+                1 - progress,
+                3
+              ));
+      }
+    }
+
+    function drawParticles() {
+      ctx.save();
+
+      ctx.globalCompositeOperation = "lighter";
+
+      particles.forEach((particle) => {
+        const alpha = Math.max(
+          0,
+          Math.min(
+            1,
+            particle.life / particle.maxLife
+          )
+        );
+
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = particle.color;
+
+        ctx.beginPath();
+        ctx.arc(
+          particle.x,
+          particle.y,
+          particle.size * (0.5 + alpha),
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      });
+
+      ctx.restore();
+
+      shockwaves.forEach((wave) => {
+        const alpha = Math.max(
+          0,
+          wave.life / wave.maxLife
+        );
+
+        ctx.save();
+
+        ctx.globalAlpha = alpha * 0.7;
+        ctx.strokeStyle = wave.color;
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.arc(
+          wave.x,
+          wave.y,
+          wave.radius,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.stroke();
+
+        ctx.restore();
+      });
+    }
+
+    function updatePlanets(dt) {
+      planets.forEach((planet) => {
+        if (!planet.alive) return;
+
+        if (planet.mode === "orbit") {
+          planet.angle +=
+            planet.speed * dt;
+
+          const pos =
+            orbitPosition(planet);
+
+          planet.x = pos.x;
+          planet.y = pos.y;
+        } else {
+          /*
+           * Sau khi Sun nổ, hành tinh tiếp tục
+           * bay xa dần.
+           */
+          const dx = planet.x - sun.x;
+          const dy = planet.y - sun.y;
+
+          const distance =
+            Math.hypot(dx, dy) || 1;
+
+          const nx = dx / distance;
+          const ny = dy / distance;
+
+          planet.vx += nx * 19 * dt;
+          planet.vy += ny * 19 * dt;
+
+          planet.x += planet.vx * dt;
+          planet.y += planet.vy * dt;
+        }
+
+        const isHovered =
+          hovered?.type === "planet" &&
+          hovered.planet === planet;
+
+        const target = isHovered ? 1 : 0;
+
+        planet.hover +=
+          (target - planet.hover) *
+          Math.min(1, dt * 12);
+      });
+    }
+
+    function hitTest(x, y) {
+      let result = null;
+      let nearest = Infinity;
+
+      if (sun.alive) {
+        const distance = Math.hypot(
+          x - sun.x,
+          y - sun.y
+        );
+
+        if (distance <= sun.radius + 12) {
+          result = {
+            type: "sun",
+          };
+
+          nearest = distance;
+        }
+      }
+
+      planets.forEach((planet) => {
+        if (!planet.alive) return;
+
+        const distance = Math.hypot(
+          x - planet.x,
+          y - planet.y
+        );
+
+        /*
+         * Hitbox tối thiểu 14px
+         * để Mercury vẫn dễ click.
+         */
+        const hitRadius = Math.max(
+          14,
+          planet.radius + 10
+        );
+
+        if (
+          distance <= hitRadius &&
+          distance < nearest
+        ) {
+          result = {
+            type: "planet",
+            planet,
+          };
+
+          nearest = distance;
+        }
+      });
+
+      return result;
+    }
+
+    function pointerPosition(event) {
+      const rect =
+        canvas.getBoundingClientRect();
+
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      };
+    }
+
+    function handlePointerMove(event) {
+      const pos = pointerPosition(event);
+
+      hovered = hitTest(pos.x, pos.y);
+
+      canvas.style.cursor = hovered
+        ? "crosshair"
+        : "default";
+    }
+
+    function handlePointerLeave() {
+      hovered = null;
+      canvas.style.cursor = "default";
+    }
+
+    function handlePointerDown(event) {
+      const pos = pointerPosition(event);
+
+      const target = hitTest(
+        pos.x,
+        pos.y
+      );
+
+      if (!target) return;
+
+      if (target.type === "sun") {
+        explodeSun();
+      } else {
+        explodePlanet(target.planet);
+      }
+    }
+
+    function animate(now) {
+      const dt = Math.min(
+        0.033,
+        Math.max(
+          0.001,
+          (now - lastTime) / 1000
+        )
+      );
+
+      lastTime = now;
+
+      updatePlanets(dt);
+      updateParticles(dt);
+
+      ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+      drawStars(now);
+      drawOrbits();
+
+      /*
+       * Vẽ planet trước Sun.
+       */
+      planets.forEach(drawPlanet);
+
+      drawSun();
+      drawParticles();
+
+      animationId =
+        requestAnimationFrame(animate);
+    }
+
+    canvas.addEventListener(
+      "pointermove",
+      handlePointerMove
+    );
+
+    canvas.addEventListener(
+      "pointerleave",
+      handlePointerLeave
+    );
+
+    canvas.addEventListener(
+      "pointerdown",
+      handlePointerDown
+    );
+
+    window.addEventListener(
+      "resize",
+      resize
+    );
+
+    resize();
+
+    animationId =
+      requestAnimationFrame(animate);
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      window.removeEventListener(
+        "resize",
+        resize
+      );
+
+      canvas.removeEventListener(
+        "pointermove",
+        handlePointerMove
+      );
+
+      canvas.removeEventListener(
+        "pointerleave",
+        handlePointerLeave
+      );
+
+      canvas.removeEventListener(
+        "pointerdown",
+        handlePointerDown
+      );
+
+      /*
+       * Restore parent nếu component unmount.
+       */
+      parent.style.position = oldPosition;
+      parent.style.overflow = oldOverflow;
+
+      modifiedSiblings.forEach(
+        ({
+          element,
+          position,
+          zIndex,
+        }) => {
+          element.style.position = position;
+          element.style.zIndex = zIndex;
+        }
+      );
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className={styles.solarSystem}
+      aria-hidden="true"
+    />
+  );
+}
